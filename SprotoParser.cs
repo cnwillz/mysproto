@@ -272,7 +272,8 @@ namespace Sproto {
 			if (protocol.tag >= SprotoParser.MAX_FIELD_TAG)
 				SprotoHelper.Error(lexer.error_pos(token.line,token.column) + "{0} protocol's tag {1} >= {2}",protocol.name,protocol.tag,SprotoParser.MAX_FIELD_TAG);
 			
-			expect(lexer,"block_start","space");
+			expect(lexer,"block_start");
+			ignore(lexer, "space");
 			while (true) {
 				token = lexer.tokens[0];
 				if ("eof" == token.type || "block_end" == token.type)
@@ -307,6 +308,21 @@ namespace Sproto {
 			if (lexer.tokens[0].type != "eof") {
 				ignore(lexer,"space");
 			}
+
+			string nameReq = $"{protocol.name}.request";
+			if (sprotomgr.GetType(nameReq) == null) {
+				SprotoType typedef = new SprotoType {name = nameReq};
+				sprotomgr.AddType(typedef);
+				protocol.request = nameReq;
+			}
+			
+			string nameRes = $"{protocol.name}.response";
+			if (sprotomgr.GetType(nameRes) == null) {
+				SprotoType typedef = new SprotoType {name = nameRes};
+				sprotomgr.AddType(typedef);
+				protocol.response = nameRes;
+			}
+			
 			return protocol;
 		}
 
